@@ -1,7 +1,7 @@
 import os
 from flask import Flask, Blueprint
 from restx import api
-from tdt_api.endpoints.taxonomy_service import ns as api_namespace
+from tdt_api.endpoints.taxonomy_service import api as api_namespace
 from flask_cors import CORS
 
 app = Flask(__name__)
