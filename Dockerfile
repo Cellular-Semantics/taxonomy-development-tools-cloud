@@ -25,10 +25,6 @@ RUN apt-get update &&  \
     sqlite3 \
     python3-psycopg2
 
-# install nanobot
-RUN curl -L -k -o /bin/nanobot 'https://github.com/ontodev/nanobot.rs/releases/download/v2023-10-26/nanobot-x86_64-unknown-linux-musl'
-RUN chmod +x /bin/nanobot
-
 WORKDIR $WORKSPACE
 
 RUN cd $WORKSPACE && python3 setup.py develop
