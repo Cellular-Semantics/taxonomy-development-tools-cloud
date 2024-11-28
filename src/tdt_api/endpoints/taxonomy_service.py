@@ -78,8 +78,6 @@ def nanobot(method, taxonomy, path):
     if path.endswith('.tsv') and os.path.isfile(filepath):
         send_from_directory(directory=taxon_dir, path=path)
 
-    # result = subprocess.run(
-    #     [os.path.join(os.getcwd(), 'bin/nanobot')],
     result = subprocess.run(
         [os.path.join(taxon_dir, 'build/nanobot')],
         cwd=f'{TAXONOMIES_VOLUME}/{taxonomy}/',
