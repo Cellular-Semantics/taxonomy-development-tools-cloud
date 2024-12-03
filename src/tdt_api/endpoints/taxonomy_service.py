@@ -74,9 +74,9 @@ def nanobot(method, taxonomy, path):
     """Call Nanobot as a CGI script
     for the given dataset, and path."""
     taxon_dir = f'{TAXONOMIES_VOLUME}/{taxonomy}/'
-    filepath = os.path.join(taxon_dir, path)
-    if path.endswith('.tsv') and os.path.isfile(filepath):
-        send_from_directory(directory=taxon_dir, path=path)
+    # filepath = os.path.join(taxon_dir, path)
+    # if path.endswith('.tsv') and os.path.isfile(filepath):
+    #     send_from_directory(directory=taxon_dir, path=path)
 
     result = subprocess.run(
         [os.path.join(taxon_dir, 'build/nanobot')],
@@ -109,6 +109,9 @@ def nanobot(method, taxonomy, path):
             body.append(line)
     response = make_response('\n'.join(body))
     response.status_code = int(response_status.split(" ")[0]) if response_status else response.status_code
+    response.headers.clear()
     for header in response_headers:
         response.headers.add(header, response_headers[header])
+        if header.strip().lower() == "content-type":
+            response.headers.add("Content-Type", response_headers[header])
     return response
