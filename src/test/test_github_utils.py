@@ -42,7 +42,7 @@ def test_check_user_permission_no_access(github_token):
 
 def test_is_user_member_of_org_member(github_token):
     orgs = ["Cellular-Semantics", "microsoft"]
-    user_id = "hkir-dev"
+    user_id = "tdt-robot"
 
     result = is_user_member_of_org(orgs, user_id)
     assert result is True
