@@ -6,12 +6,16 @@ from flask_restx import Resource
 from tdt_api.restx import api
 from flask import send_from_directory, request, make_response, jsonify
 from tdt_api.exception.api_exception import ApiException
+from tdt_api.utils.command_line_utils import runcmd
+from tdt_api.utils.github_utils import check_user_permission, Permissions
 
-TAXONOMIES_VOLUME = '/code/taxonomies'
+
+TAXONOMIES_VOLUME = os.getenv('TAXONOMIES_VOLUME')
 
 api = api.namespace('api', description='Taxonomy API')
 
 log = logging.getLogger(__name__)
+
 
 @api.route('/taxonomies', methods=['GET'])
 class TaxonomiesEndpoint(Resource):
@@ -24,6 +28,19 @@ class TaxonomiesEndpoint(Resource):
         """
         response = flask.jsonify("Taxonomies listing")
         return response
+
+@api.route('/check_permissions/<string:repo_org>/<string:repo_name>/<string:user_id>', methods=['GET'])
+class CheckPermissionsEndpoint(Resource):
+
+    def get(self, repo_org, repo_name, user_id):
+        """
+        Check user permissions for a given repository.
+
+        Returns the permission level (read, write, none) for the user.
+        """
+        permission, status_code = check_user_permission(repo_org, repo_name, user_id)
+        return permission.value, status_code
+
 
 @api.route('/browser/<string:taxonomy>/<path:path>', methods=['GET', 'POST'])
 class NanobotEndpoint(Resource):
@@ -41,9 +58,9 @@ class InitTaxonomyEndpoint(Resource):
 
     def get(self, taxonomy):
         print(f"init {taxonomy}")
-        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, "human-neocortex-non-neuronal-cells")
-        subprocess.run(['make', 'init'], cwd=taxonomy_dir, check=True)
-        return flask.jsonify("Success")
+        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
+        runcmd("make init", cwd=taxonomy_dir)
+        return "Success"
 
 
 @api.route('/add_taxonomy', methods=['POST'])
@@ -53,22 +70,32 @@ class AddTaxonomyEndpoint(Resource):
         data = request.get_json()
         repo_url = data.get('repo_url', 'https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git')
         branch = data.get('branch', 'main')
-        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, "human-neocortex-non-neuronal-cells")
+        if not str(repo_url).endswith(".git"):
+            repo_url = repo_url + ".git"
+        repo_name = str(repo_url).split("/")[-1].split(".")[0]
+        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, repo_name)
+        if os.path.exists(taxonomy_dir):
+            return {"message": "Repository already cloned and initialized."}, 200
+        else:
+            return self.init_taxonomy_folder(branch, repo_url, taxonomy_dir)
 
+    @staticmethod
+    def init_taxonomy_folder(branch, repo_url, taxonomy_dir):
         try:
             # Clone the repository
-            subprocess.run(['git', 'clone', repo_url, TAXONOMIES_VOLUME], check=True)
+            runcmd(f"git clone {repo_url}", cwd=TAXONOMIES_VOLUME)
 
             # Navigate to the branch
-            subprocess.run(['git', 'checkout', branch], cwd=taxonomy_dir, check=True)
+            runcmd(f"git checkout {branch}", cwd=taxonomy_dir, supress_exceptions=True)
 
             # Run 'make init'
-            subprocess.run(['make', 'init'], cwd=taxonomy_dir, check=True)
+            runcmd(f"make init", cwd=taxonomy_dir)
 
-            return jsonify({"message": "Repository cloned and initialized successfully."}), 200
-        except subprocess.CalledProcessError as e:
+            return {"message": "Repository cloned and initialized successfully."}, 200
+        except Exception as e:
             log.error(f"An error occurred: {e}")
-            return jsonify({"message": "An error occurred while processing the request."}), 500
+            return {"message": "An error occurred while processing the request."}, 500
+
 
 def nanobot(method, taxonomy, path):
     """Call Nanobot as a CGI script

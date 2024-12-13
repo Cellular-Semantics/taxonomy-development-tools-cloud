@@ -2,6 +2,10 @@ FROM ubuntu:22.04
 
 ENV WORKSPACE=/code
 ENV HTTPS=False
+ENV TAXONOMIES_VOLUME=/code/taxonomies
+
+ENV GITHUB_TOKEN=provide_token
+ENV TDT_URL_PREFIX=""
 
 RUN apt-get update
 RUN apt-get install -y curl unzip
@@ -18,6 +22,7 @@ RUN pip install -r /code/requirements.txt
 # copy except __init__.py file and test folder
 ADD src/tdt_api/endpoints $WORKSPACE/tdt_api/endpoints
 ADD src/tdt_api/exception $WORKSPACE/tdt_api/exception
+ADD src/tdt_api/utils $WORKSPACE/tdt_api/utils
 ADD src/tdt_api/app.py src/tdt_api/restx.py $WORKSPACE/tdt_api/
 
 RUN apt-get update &&  \

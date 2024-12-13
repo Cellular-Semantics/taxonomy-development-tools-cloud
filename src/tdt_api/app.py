@@ -3,12 +3,13 @@ from flask import Flask, Blueprint
 from restx import api
 from tdt_api.endpoints.taxonomy_service import api as api_namespace
 from flask_cors import CORS
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
 app.config["CORS_HEADERS"] = "Content-Type"
 
-# Get URL prefix from environment variable or use root ('/') by default
+# Get URL prefix from environment variable or uses root ('/') by default
 url_prefix = os.environ.get("TDT_URL_PREFIX", "")
 
 blueprint = Blueprint("tdt", __name__, url_prefix=url_prefix)
@@ -21,6 +22,9 @@ def initialize_app(flask_app):
 
 
 def main():
+    if os.path.exists('.env'):
+        load_dotenv('.env')
+
     initialize_app(app)
     app.run(host="0.0.0.0", port=8080, debug=False)
 

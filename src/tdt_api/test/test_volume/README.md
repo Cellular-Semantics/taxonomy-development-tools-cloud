@@ -1,0 +1,1 @@
+This folder hosts the test repositories, do not commit
