@@ -1,9 +1,9 @@
 import pytest
 from dotenv import load_dotenv
 import os
-from tdt_api.utils.github_utils import check_user_permission, Permissions
+from tdt_api.utils.github_utils import check_user_permission, Permissions, is_user_member_of_org
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '../../../.env'))
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
 
 @pytest.fixture
@@ -39,3 +39,17 @@ def test_check_user_permission_no_access(github_token):
 
     assert status_code == 403
     assert permission == Permissions.NO_ACCESS
+
+def test_is_user_member_of_org_member(github_token):
+    orgs = ["Cellular-Semantics", "microsoft"]
+    user_id = "hkir-dev"
+
+    result = is_user_member_of_org(orgs, user_id)
+    assert result is True
+
+def test_is_user_member_of_org_not_member(github_token):
+    orgs = ["microsoft", "APPLE"]
+    user_id = "tdt-robot"
+
+    result = is_user_member_of_org(orgs, user_id)
+    assert result is False

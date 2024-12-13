@@ -38,3 +38,25 @@ def check_user_permission(repo_org:str, repo_name: str, user_id: str) -> tuple[P
         print(response.json())
         log.error(f"An error occurred: {response.json()}")
     return permission, response.status_code
+
+
+def is_user_member_of_org(orgs, user_id):
+    """
+    Check if the user is a member of any of the given organizations.
+
+    :param orgs: List of GitHub organization names
+    :param user_id: GitHub user id
+    :return: True if the user is a member of any organization, False otherwise
+    """
+    github_token = os.getenv('GITHUB_TOKEN')
+    headers = {
+        'Authorization': f'token {github_token}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+
+    for org in orgs:
+        url = f'https://api.github.com/orgs/{org}/members/{user_id}'
+        response = requests.get(url, headers=headers)
+        if response.status_code == 204:
+            return True
+    return False
