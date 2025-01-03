@@ -3,6 +3,8 @@ import requests
 import logging
 from enum import Enum
 
+from tdt_api.utils.command_line_utils import runcmd
+
 log = logging.getLogger(__name__)
 
 
@@ -10,6 +12,23 @@ class Permissions(Enum):
     READ = 'read'
     WRITE = 'write'
     NO_ACCESS = 'no_access'
+
+
+def init_taxonomy_folder(branch, repo_url, taxonomies_volume, taxonomy_dir):
+    try:
+        # Clone the repository
+        runcmd(f"git clone {repo_url}", cwd=taxonomies_volume)
+
+        # Navigate to the branch
+        runcmd(f"git checkout {branch}", cwd=taxonomy_dir, supress_exceptions=True)
+
+        # Run 'make init'
+        runcmd(f"make init", cwd=taxonomy_dir)
+
+        return {"message": "Repository cloned and initialized successfully."}, 200
+    except Exception as e:
+        log.error(f"An error occurred: {e}")
+        return {"message": "An error occurred while processing the request."}, 500
 
 def check_user_permission(repo_org:str, repo_name: str, user_id: str) -> tuple[Permissions, int]:
     """

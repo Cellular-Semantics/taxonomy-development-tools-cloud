@@ -2,6 +2,7 @@ import os
 from flask import Flask, Blueprint
 from restx import api
 from tdt_api.endpoints.taxonomy_service import api as api_namespace
+from tdt_api.endpoints.admin_service import api as admin_api_namespace
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -18,6 +19,7 @@ blueprint = Blueprint("tdt", __name__, url_prefix=url_prefix)
 def initialize_app(flask_app):
     api.init_app(blueprint)
     api.add_namespace(api_namespace)
+    # api.add_namespace(admin_api_namespace)
     flask_app.register_blueprint(blueprint)
 
 

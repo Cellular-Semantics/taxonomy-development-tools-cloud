@@ -7,7 +7,7 @@ from tdt_api.restx import api
 from flask import send_from_directory, request, make_response, jsonify
 from tdt_api.exception.api_exception import ApiException
 from tdt_api.utils.command_line_utils import runcmd
-from tdt_api.utils.github_utils import check_user_permission, Permissions
+from tdt_api.utils.github_utils import check_user_permission, Permissions, init_taxonomy_folder
 
 
 TAXONOMIES_VOLUME = os.getenv('TAXONOMIES_VOLUME')
@@ -47,10 +47,24 @@ class NanobotEndpoint(Resource):
 
     def get(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
+        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
+        nanobot_db_path = os.path.join(taxonomy_dir, 'build/nanobot.db')
+
+        if not os.path.exists(nanobot_db_path):
+            runcmd("make init", cwd=taxonomy_dir)
+            log.info(f"Taxonomy {taxonomy} initialized successfully.")
+
         return nanobot('GET', taxonomy, path)
 
     def post(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
+        taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
+        nanobot_db_path = os.path.join(taxonomy_dir, 'build/nanobot.db')
+
+        if not os.path.exists(nanobot_db_path):
+            runcmd("make init", cwd=taxonomy_dir)
+            log.info(f"Taxonomy {taxonomy} initialized successfully.")
+
         return nanobot('POST', taxonomy, path)
 
 @api.route('/init_taxonomy/<string:taxonomy>', methods=['GET'])
@@ -68,7 +82,7 @@ class AddTaxonomyEndpoint(Resource):
 
     def post(self):
         data = request.get_json()
-        repo_url = data.get('repo_url', 'https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git')
+        repo_url = data.get('repo_url')
         branch = data.get('branch', 'main')
         if not str(repo_url).endswith(".git"):
             repo_url = repo_url + ".git"
@@ -77,24 +91,7 @@ class AddTaxonomyEndpoint(Resource):
         if os.path.exists(taxonomy_dir):
             return {"message": "Repository already cloned and initialized."}, 200
         else:
-            return self.init_taxonomy_folder(branch, repo_url, taxonomy_dir)
-
-    @staticmethod
-    def init_taxonomy_folder(branch, repo_url, taxonomy_dir):
-        try:
-            # Clone the repository
-            runcmd(f"git clone {repo_url}", cwd=TAXONOMIES_VOLUME)
-
-            # Navigate to the branch
-            runcmd(f"git checkout {branch}", cwd=taxonomy_dir, supress_exceptions=True)
-
-            # Run 'make init'
-            runcmd(f"make init", cwd=taxonomy_dir)
-
-            return {"message": "Repository cloned and initialized successfully."}, 200
-        except Exception as e:
-            log.error(f"An error occurred: {e}")
-            return {"message": "An error occurred while processing the request."}, 500
+            return init_taxonomy_folder(branch, repo_url, TAXONOMIES_VOLUME, taxonomy_dir)
 
 
 def nanobot(method, taxonomy, path):

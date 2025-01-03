@@ -9,6 +9,7 @@ ENV TDT_URL_PREFIX=""
 
 RUN apt-get update
 RUN apt-get install -y curl unzip
+RUN apt-get install -y git
 RUN apt-get install -y sqlite3 libsqlite3-dev
 RUN apt-get install -y mariadb-client
 RUN apt-get install -y python3-pip
