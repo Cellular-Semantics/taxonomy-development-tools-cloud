@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV WORKSPACE=/code
 ENV HTTPS=False
-ENV TAXONOMIES_VOLUME=/code/taxonomies
+ENV TAXONOMIES_VOLUME=$WORKSPACE/taxonomies
 
 ENV GITHUB_TOKEN=provide_token
 ENV TDT_URL_PREFIX=""
@@ -16,7 +16,7 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y openjdk-11-jre-headless
 RUN apt-get install -y make
 
-RUN mkdir $WORKSPACE $WORKSPACE/tdt_api
+RUN mkdir -p $WORKSPACE $WORKSPACE/tdt_api $TAXONOMIES_VOLUME
 ADD requirements.txt setup.py logging.conf $WORKSPACE/
 
 RUN pip install -r /code/requirements.txt

@@ -19,7 +19,7 @@ blueprint = Blueprint("tdt", __name__, url_prefix=url_prefix)
 def initialize_app(flask_app):
     api.init_app(blueprint)
     api.add_namespace(api_namespace)
-    # api.add_namespace(admin_api_namespace)
+    api.add_namespace(admin_api_namespace)
     flask_app.register_blueprint(blueprint)
 
 
