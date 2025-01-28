@@ -48,24 +48,24 @@ class NanobotEndpoint(Resource):
     def get(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
         taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
-        nanobot_db_path = os.path.join(taxonomy_dir, 'build/nanobot.db')
+        nanobot_db_path = os.path.join(taxonomy_dir, '.relatable/relatable.db')
 
         if not os.path.exists(nanobot_db_path):
             runcmd("make init", cwd=taxonomy_dir)
             log.info(f"Taxonomy {taxonomy} initialized successfully.")
 
-        return nanobot('GET', taxonomy, path)
+        return rltbl('GET', taxonomy, path, "hkir-dev", "FALSE")
 
     def post(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
         taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
-        nanobot_db_path = os.path.join(taxonomy_dir, 'build/nanobot.db')
+        nanobot_db_path = os.path.join(taxonomy_dir, '.relatable/relatable.db')
 
         if not os.path.exists(nanobot_db_path):
             runcmd("make init", cwd=taxonomy_dir)
             log.info(f"Taxonomy {taxonomy} initialized successfully.")
 
-        return nanobot('POST', taxonomy, path)
+        return rltbl('POST', taxonomy, path, "hkir-dev", "FALSE")
 
 @api.route('/init_taxonomy/<string:taxonomy>', methods=['GET'])
 class InitTaxonomyEndpoint(Resource):
@@ -93,6 +93,67 @@ class AddTaxonomyEndpoint(Resource):
         else:
             return init_taxonomy_folder(branch, repo_url, TAXONOMIES_VOLUME, taxonomy_dir)
 
+def rltbl(method, taxonomy, path, username, readonly="TRUE"):
+    """Call Relatable as a CGI script."""
+    # username = ''
+    # user_id = session.get('user_id', None)
+    # if not user_id:
+    #     return redirect('/')
+    # user = User.query.get(user_id)
+    # if not user:
+    #     return redirect('/')
+    # username = user.github_login
+    # print("PYTHON USER", user_id, username)
+
+    # readonly = 'TRUE'
+    # if check_user_permission(repo_org, taxonomy, user_id) == Permissions.WRITE:
+    #     readonly = 'FALSE'
+
+    path = f'/{path}'
+    # method = request.method
+    data = request.get_data().decode('utf-8')
+
+    env={
+        'GATEWAY_INTERFACE': 'CGI/1.1',
+        'REQUEST_METHOD': method,
+        'PATH_INFO': path,
+        'QUERY_STRING': request.query_string.decode('utf-8'),
+        'CONTENT_TYPE': request.headers.get('content-type') or '',
+        'RLTBL_READONLY': readonly,
+        'RLTBL_USER': username,
+    }
+    print(env)
+    # print("RLTBL", env, data, type(data))
+    taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
+    print(os.path.join(taxonomy_dir, 'bin/rltbl'))
+    result = subprocess.run(
+        [os.path.join(taxonomy_dir, 'bin/rltbl')],
+        env=env,
+        input=data or '',
+        text=True,
+        capture_output=True
+    )
+    status = 200
+    headers = {}
+    body = []
+    reading_headers = True
+    for line in result.stdout.splitlines():
+        if reading_headers and line.strip() == '':
+            reading_headers = False
+            continue
+        if reading_headers:
+            name, value = line.split(': ', 1)
+            if name.lower() == 'status':
+                status = value
+            if name.lower() in ['vary', 'cookie', 'set-cookie']:
+                pass
+            else:
+                headers[name] = value
+        else:
+            print(line)
+            body.append(line)
+    print(headers)
+    return make_response(('\n'.join(body), status, headers))
 
 def nanobot(method, taxonomy, path):
     """Call Nanobot as a CGI script
