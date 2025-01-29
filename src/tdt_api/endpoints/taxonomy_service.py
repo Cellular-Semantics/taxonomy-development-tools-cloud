@@ -113,6 +113,7 @@ def rltbl(api_request, method, taxonomy, path, username, readonly="TRUE"):
         'CONTENT_TYPE': api_request.headers.get('content-type') or "text/html",
         'RLTBL_READONLY': readonly,
         'RLTBL_USER': username,
+        'RLTBL_ROOT': "/api/browser/human-brain-cell-atlas_v1_non-neuronal"
     }
     print(env)
     # print("RLTBL", env, data, type(data))
