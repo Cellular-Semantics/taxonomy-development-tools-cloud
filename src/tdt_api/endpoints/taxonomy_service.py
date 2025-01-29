@@ -2,6 +2,7 @@ import os
 import flask
 import logging
 import subprocess
+import jwt
 from flask_restx import Resource
 from tdt_api.restx import api
 from flask import send_from_directory, request, make_response, jsonify
@@ -9,12 +10,12 @@ from tdt_api.exception.api_exception import ApiException
 from tdt_api.utils.command_line_utils import runcmd
 from tdt_api.utils.github_utils import check_user_permission, Permissions, init_taxonomy_folder
 
+api = api.namespace('api', description='Taxonomy API')
+log = logging.getLogger(__name__)
 
 TAXONOMIES_VOLUME = os.getenv('TAXONOMIES_VOLUME')
-
-api = api.namespace('api', description='Taxonomy API')
-
-log = logging.getLogger(__name__)
+RLTBL_DB = '.relatable/relatable.db'
+DEFAULT_USER = "default_user"
 
 
 @api.route('/taxonomies', methods=['GET'])
@@ -43,29 +44,35 @@ class CheckPermissionsEndpoint(Resource):
 
 
 @api.route('/browser/<string:taxonomy>/<path:path>', methods=['GET', 'POST'])
-class NanobotEndpoint(Resource):
+class BrowserEndpoint(Resource):
 
     def get(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
         taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
-        nanobot_db_path = os.path.join(taxonomy_dir, '.relatable/relatable.db')
+        nanobot_db_path = os.path.join(taxonomy_dir, RLTBL_DB)
 
         if not os.path.exists(nanobot_db_path):
             runcmd("make init", cwd=taxonomy_dir)
-            log.info(f"Taxonomy {taxonomy} initialized successfully.")
+            print(f"Taxonomy {taxonomy} initialized successfully.")
 
-        return rltbl('GET', taxonomy, path, "hkir-dev", "FALSE")
+        user, email, repo_org = get_session_info()
+        permission, status_code = check_user_permission(repo_org, taxonomy, user)
+
+        return rltbl(request,'GET', taxonomy, path, user, permission.to_boolean())
 
     def post(self, taxonomy, path):
         print(f"browse {taxonomy}/{path}")
         taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
-        nanobot_db_path = os.path.join(taxonomy_dir, '.relatable/relatable.db')
+        nanobot_db_path = os.path.join(taxonomy_dir, RLTBL_DB)
 
         if not os.path.exists(nanobot_db_path):
             runcmd("make init", cwd=taxonomy_dir)
-            log.info(f"Taxonomy {taxonomy} initialized successfully.")
+            print(f"Taxonomy {taxonomy} initialized successfully.")
 
-        return rltbl('POST', taxonomy, path, "hkir-dev", "FALSE")
+        user, email, repo_org = get_session_info()
+        permission, status_code = check_user_permission(repo_org, taxonomy, user)
+
+        return rltbl(request, 'POST', taxonomy, path, user, permission.to_boolean())
 
 @api.route('/init_taxonomy/<string:taxonomy>', methods=['GET'])
 class InitTaxonomyEndpoint(Resource):
@@ -93,46 +100,38 @@ class AddTaxonomyEndpoint(Resource):
         else:
             return init_taxonomy_folder(branch, repo_url, TAXONOMIES_VOLUME, taxonomy_dir)
 
-def rltbl(method, taxonomy, path, username, readonly="TRUE"):
+def rltbl(api_request, method, taxonomy, path, username, readonly="TRUE"):
     """Call Relatable as a CGI script."""
-    # username = ''
-    # user_id = session.get('user_id', None)
-    # if not user_id:
-    #     return redirect('/')
-    # user = User.query.get(user_id)
-    # if not user:
-    #     return redirect('/')
-    # username = user.github_login
-    # print("PYTHON USER", user_id, username)
-
-    # readonly = 'TRUE'
-    # if check_user_permission(repo_org, taxonomy, user_id) == Permissions.WRITE:
-    #     readonly = 'FALSE'
-
     path = f'/{path}'
-    # method = request.method
-    data = request.get_data().decode('utf-8')
+    data = api_request.get_data().decode('utf-8')
 
     env={
         'GATEWAY_INTERFACE': 'CGI/1.1',
         'REQUEST_METHOD': method,
         'PATH_INFO': path,
-        'QUERY_STRING': request.query_string.decode('utf-8'),
-        'CONTENT_TYPE': request.headers.get('content-type') or '',
+        'QUERY_STRING': api_request.query_string.decode('utf-8'),
+        'CONTENT_TYPE': api_request.headers.get('content-type') or "text/html",
         'RLTBL_READONLY': readonly,
         'RLTBL_USER': username,
     }
     print(env)
     # print("RLTBL", env, data, type(data))
     taxonomy_dir = os.path.join(TAXONOMIES_VOLUME, taxonomy)
-    print(os.path.join(taxonomy_dir, 'bin/rltbl'))
     result = subprocess.run(
         [os.path.join(taxonomy_dir, 'bin/rltbl')],
+        cwd=f'{TAXONOMIES_VOLUME}/{taxonomy}/',
         env=env,
         input=data or '',
         text=True,
         capture_output=True
     )
+
+    if result.returncode != 0:
+        log.error("Error running rltbl")
+        log.error("Return code: " + str(result.returncode))
+        log.error("Stderr: " + str(result.stderr))
+        raise ApiException("Error running rltbl", 500)
+
     status = 200
     headers = {}
     body = []
@@ -150,10 +149,23 @@ def rltbl(method, taxonomy, path, username, readonly="TRUE"):
             else:
                 headers[name] = value
         else:
-            print(line)
             body.append(line)
-    print(headers)
     return make_response(('\n'.join(body), status, headers))
+
+
+def get_session_info():
+    token = request.args.get('token')
+    user = DEFAULT_USER
+    email = None
+    repo_org = None
+    if token:
+        decoded = jwt.decode(token, os.getenv('TOKEN_SECRET'), algorithms=['HS256'])
+        print("Session data :" + str(decoded))
+        user = decoded.get('name')
+        email = decoded.get('email')
+        repo_org = decoded.get('repoOrg')
+
+    return user, email, repo_org
 
 def nanobot(method, taxonomy, path):
     """Call Nanobot as a CGI script
