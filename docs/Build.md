@@ -15,6 +15,7 @@ create an `.env` file with the following content:
 ```
 GITHUB_TOKEN=your_github_token
 ADMIN_SECRET=your_admin_secret
+NEXTAUTH_SECRET=frontend auth secret
 ```
 
 You can use [https://generate-secret.vercel.app/32](https://generate-secret.vercel.app/32) to generate a random secret. Note it privately as it is used to access the admin APIs.

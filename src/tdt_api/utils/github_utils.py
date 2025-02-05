@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 # Create a cache with a time-to-live of 600 seconds (10 minutes)
 cache = TTLCache(maxsize=100, ttl=600)
 
-DEFAULT_USER = "default_user"
+DEFAULT_USER = "visitor"
 
 
 class Permissions(Enum):
@@ -55,7 +55,7 @@ def check_user_permission(repo_org:str, repo_name: str, user_id: str) -> tuple[P
     """
     permission = Permissions.NO_ACCESS
     status_code = 403
-    if user_id != DEFAULT_USER:
+    if repo_org and user_id != DEFAULT_USER:
         github_token = os.getenv('GITHUB_TOKEN')
         headers = {
             'Authorization': f'token {github_token}',
