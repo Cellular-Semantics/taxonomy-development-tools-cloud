@@ -30,6 +30,24 @@ class TaxonomiesEndpoint(Resource):
         response = flask.jsonify("Taxonomies listing")
         return response
 
+@api.route('/session_info/<string:repo_name>', methods=['GET'])
+class GetSessionInfoEndpoint(Resource):
+
+    def get(self, repo_name):
+        """
+        Get session information
+
+        Returns the user, repo_org, and permission level.
+        """
+        user, email, repo_org = get_session_info(request)
+        permission, status_code = check_user_permission(repo_org, repo_name, user)
+        return {
+            "user": user,
+            "repo_org": repo_org,
+            "permission": permission.value,
+            "tdt_web": os.getenv('TDT_WEB', '')
+        }, status_code
+
 @api.route('/check_permissions/<string:repo_org>/<string:repo_name>/<string:user_id>', methods=['GET'])
 class CheckPermissionsEndpoint(Resource):
 
