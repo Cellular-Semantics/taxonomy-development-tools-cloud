@@ -28,7 +28,7 @@ def update_repos(repositories, tdt_version, taxonomies_folder):
             runcmd(f"git checkout {repositories[repo_url]}", cwd=taxonomy_dir, supress_exceptions=True)
 
             # Run 'make init'
-            runcmd(f"bash run.sh make init", cwd=taxonomy_dir)
+            # runcmd(f"bash run.sh make init", cwd=taxonomy_dir)
             log.info(f"Taxonomy {repo_name} initialized successfully.")
 
         update_run_sh(taxonomy_dir, tdt_version)
@@ -70,17 +70,17 @@ def update_run_sh(taxonomy_dir, tdt_version):
 
 
 repositories = {
-    "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "cloud",
-    "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud",
-    "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "cloud",
-    "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "cloud",
-    "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "cloud",
-    "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "cloud",
-    "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "cloud",
-    "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "cloud",
-    "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "cloud",
-    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_macaque_taxonomy.git": "cloud",
-    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_human_taxonomy.git": "cloud",
+    "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "cloud-rltbl",
+    "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud-rltbl",
+    "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "cloud-rltbl",
+    "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_macaque_taxonomy.git": "cloud-rltbl",
+    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_human_taxonomy.git": "cloud-rltbl",
 }
 
-update_repos(repositories, "2.0.0", "/Users/hk9/Downloads/tdt_cloud")
+update_repos(repositories, "2.1.0", "/Users/hk9/Downloads/tdt_cloud_rltbl")

@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 init_taxonomies_model = api.model('InitTaxonomies', {
     'repositories': fields.Raw(required=True, example={
         "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "cloud",
-        "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud-rltbl",
+        "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud",
         "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "cloud",
         "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "cloud",
         "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "cloud",
