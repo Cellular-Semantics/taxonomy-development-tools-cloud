@@ -131,9 +131,10 @@ def rltbl(api_request, method, taxonomy, path, username, readonly="TRUE"):
         'CONTENT_TYPE': api_request.headers.get('content-type') or "text/html",
         'RLTBL_READONLY': readonly,
         'RLTBL_USER': username,
-        'RLTBL_ROOT': "/api/browser/" + taxonomy,
+        'RLTBL_ROOT': os.getenv("RLTBL_ROOT") + taxonomy,
+        # 'RLTBL_ROOT': "/api/browser/" + taxonomy,
+        # 'RLTBL_ROOT': "/tdt_api/browser/" + taxonomy,  # for PROD
         'RLTBL_GIT_AUTHOR': username,
-        # 'RLTBL_ROOT': "/tdt_api/browser/" + taxonomy,  # for server deployment
     }
     print("USER is: " + username)
     # print("RLTBL", env, data, type(data))
