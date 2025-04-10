@@ -79,8 +79,8 @@ repositories = {
     "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "cloud-rltbl",
     "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "cloud-rltbl",
     "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_macaque_taxonomy.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/nhp_basal_ganglia_human_taxonomy.git": "cloud-rltbl",
+    "https://github.com/brain-bican/basal_ganglia_macaque_taxonomy.gi": "cloud-rltbl",
+    "https://github.com/brain-bican/basal_ganglia_human_taxonomy.git": "cloud-rltbl",
 }
 
 update_repos(repositories, "2.1.0", "/Users/hk9/Downloads/tdt_cloud_rltbl")
