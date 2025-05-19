@@ -70,17 +70,18 @@ def update_run_sh(taxonomy_dir, tdt_version):
 
 
 repositories = {
-    "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "cloud-rltbl",
-    "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud-rltbl",
-    "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "cloud-rltbl",
-    "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "cloud-rltbl",
-    "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "cloud-rltbl",
-    "https://github.com/brain-bican/basal_ganglia_macaque_taxonomy.gi": "cloud-rltbl",
-    "https://github.com/brain-bican/basal_ganglia_human_taxonomy.git": "cloud-rltbl",
+    "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "main",
+    "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "main",
+    "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "main",
+    "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "main",
+    "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "main",
+    "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "main",
+    "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "main",
+    "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "main",
+    "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "main",
+    "https://github.com/brain-bican/basal_ganglia_macaque_taxonomy.gi": "main",
+    "https://github.com/brain-bican/basal_ganglia_human_taxonomy.git": "main",
+    "https://github.com/brain-bican/basal_ganglia_consensus_taxonomy.git": "main",
 }
 
 update_repos(repositories, "2.1.0", "/Users/hk9/Downloads/tdt_cloud_rltbl")

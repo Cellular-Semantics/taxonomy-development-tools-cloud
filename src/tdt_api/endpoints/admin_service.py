@@ -19,17 +19,18 @@ log = logging.getLogger(__name__)
 
 init_taxonomies_model = api.model('InitTaxonomies', {
     'repositories': fields.Raw(required=True, example={
-        "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "cloud-rltbl",
-        "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "cloud-rltbl",
-        "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "cloud-rltbl",
-        "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "cloud-rltbl",
-        "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "cloud-rltbl",
-        "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "cloud-rltbl",
-        "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "cloud-rltbl",
-        "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "cloud-rltbl",
-        "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "cloud-rltbl",
-        "https://github.com/brain-bican/basal_ganglia_macaque_taxonomy.git": "cloud-rltbl",
-        "https://github.com/brain-bican/basal_ganglia_human_taxonomy.git": "cloud-rltbl"
+        "https://github.com/brain-bican/human-brain-cell-atlas_v1_neurons.git": "main",
+        "https://github.com/brain-bican/human-brain-cell-atlas_v1_non-neuronal.git": "main",
+        "https://github.com/brain-bican/whole_mouse_brain_taxonomy.git": "main",
+        "https://github.com/Cellular-Semantics/human-neocortex-non-neuronal-cells.git": "main",
+        "https://github.com/Cellular-Semantics/human-neocortex-mge-derived-interneurons.git": "main",
+        "https://github.com/Cellular-Semantics/human-neocortex-it-projecting-excitatory-neurons.git": "main",
+        "https://github.com/Cellular-Semantics/human-neocortex-deep-layer-excitatory-neurons.git": "main",
+        "https://github.com/Cellular-Semantics/human-neocortex-cge-derived-interneurons.git": "main",
+        "https://github.com/brain-bican/human-neocortex-middle-temporal-gyrus.git": "main",
+        "https://github.com/brain-bican/basal_ganglia_macaque_taxonomy.git": "main",
+        "https://github.com/brain-bican/basal_ganglia_human_taxonomy.git": "main",
+        "https://github.com/brain-bican/basal_ganglia_consensus_taxonomy.git": "main",
     }),
     'admin_secret': fields.String(required=True, example="your_admin_secret")
 })
